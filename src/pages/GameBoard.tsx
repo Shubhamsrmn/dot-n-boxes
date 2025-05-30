@@ -4,7 +4,7 @@ import type { storeType } from "../store/store";
 import { useEffect } from "react";
 import { updateGameStateData } from "../store/gameStateSlice";
 
-import { useNavigate } from "react-router";
+// import { useNavigate } from "react-router";
 import ScoreBoardContainer from "../components/game-board/ScoreBoardContainer";
 const getRandomItems = (gameBoardLength: number) => {
   const randomRowIndex = Math.floor(Math.random() * gameBoardLength);
@@ -18,10 +18,11 @@ const getRandomItems = (gameBoardLength: number) => {
   return { randomColIndex, randomRowIndex, randomSide };
 };
 const GameBoard = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { boardData, linesCount, botBoxesCount, userBoxesCount, playerTurn } =
-    useSelector((state: storeType) => state.gameState);
+  const { boardData, linesCount, playerTurn } = useSelector(
+    (state: storeType) => state.gameState
+  );
 
   useEffect(() => {
     let timeoutId: any;
