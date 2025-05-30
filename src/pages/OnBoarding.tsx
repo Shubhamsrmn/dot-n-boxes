@@ -3,9 +3,6 @@ import welcomeImage from "../assets/Welcome-rafiki.svg";
 const OnBoarding = () => {
   return (
     <div className="">
-      <h1 className="text-center text-5xl font-bold text-shadow-md/30 text-shadow-black text-[#1D3557] uppercase mb-8">
-        Dots And Boxes
-      </h1>
       <div className="flex items-center justify-center gap-8">
         <div className="bg-white w-[40rem] p-4 rounded-md space-y-2 font-medium text-md">
           <h2>
@@ -27,7 +24,7 @@ const OnBoarding = () => {
           </h2>
 
           <Link to={"/game-board"} className="mt-2 inline-block w-max">
-            <p className="bg-[#3A86FF] p-2 px-8 text-white font-semibold rounded-lg">
+            <p className="bg-blue-600 p-2 px-8 text-white font-semibold rounded-lg">
               Play
             </p>
           </Link>

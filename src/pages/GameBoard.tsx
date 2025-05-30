@@ -3,7 +3,9 @@ import SingleConnectedRow from "../components/game-board/SingleConnectedRow";
 import type { storeType } from "../store/store";
 import { useEffect } from "react";
 import { updateGameStateData } from "../store/gameStateSlice";
-import { toggleUserTurn } from "../store/userStateSlice";
+
+import { useNavigate } from "react-router";
+import ScoreBoardContainer from "../components/game-board/ScoreBoardContainer";
 const getRandomItems = (gameBoardLength: number) => {
   const randomRowIndex = Math.floor(Math.random() * gameBoardLength);
   const randomColIndex = Math.floor(Math.random() * gameBoardLength);
@@ -16,41 +18,70 @@ const getRandomItems = (gameBoardLength: number) => {
   return { randomColIndex, randomRowIndex, randomSide };
 };
 const GameBoard = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const gameBoardState = useSelector((state: storeType) => state.gameState);
-  const { isUserTurn } = useSelector((state: storeType) => state.userState);
+  const { boardData, linesCount, botBoxesCount, userBoxesCount, playerTurn } =
+    useSelector((state: storeType) => state.gameState);
 
   useEffect(() => {
-    if (!isUserTurn) {
-      let validMove = false;
-      while (!validMove) {
-        const { randomRowIndex, randomColIndex, randomSide } = getRandomItems(
-          gameBoardState.length
-        );
-        if (gameBoardState[randomRowIndex][randomColIndex][randomSide] === -1) {
-          dispatch(
-            updateGameStateData({
-              rowIndex: randomRowIndex,
-              colIndex: randomColIndex,
-              side: randomSide,
-              value: 0,
-            })
+    let timeoutId: any;
+
+    if (playerTurn === "blue" && linesCount !== 0) {
+      const makeBotMove = () => {
+        let validMove = false;
+        let tries = 0;
+        while (!validMove && tries < 100) {
+          const { randomRowIndex, randomColIndex, randomSide } = getRandomItems(
+            boardData.length
           );
-          dispatch(toggleUserTurn());
-          validMove = true;
+          if (boardData[randomRowIndex][randomColIndex][randomSide] === -1) {
+            dispatch(
+              updateGameStateData({
+                rowIndex: randomRowIndex,
+                colIndex: randomColIndex,
+                side: randomSide,
+                value: 0,
+              })
+            );
+            validMove = true;
+            tries++;
+          }
         }
-      }
+      };
+
+      timeoutId = setTimeout(makeBotMove, 300);
     }
-  }, [isUserTurn]);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [playerTurn, boardData, dispatch]);
+
+  // useEffect(() => {
+  //   if (linesCount === 0 && botBoxesCount !== 0 && userBoxesCount !== 0) {
+  //     const winner =
+  //       botBoxesCount === userBoxesCount
+  //         ? -1
+  //         : botBoxesCount > userBoxesCount
+  //         ? 1
+  //         : userBoxesCount > botBoxesCount
+  //         ? 0
+  //         : null;
+  //     dispatch(updateGameWinner({ type: winner }));
+  //     if (winner !== null) {
+  //       setTimeout(() => {
+  //         return navigate("/winner-page");
+  //       }, 1000);
+  //     }
+  //   }
+  // }, [linesCount, botBoxesCount, userBoxesCount]);
 
   return (
-    <div className="h-full flex flex-col items-center justify-center">
-      <h1 className="text-center text-5xl font-bold text-shadow-md/30 text-shadow-black text-[#1D3557] uppercase mb-8">
-        Dots & Boxes
-      </h1>
-      {gameBoardState.map((row, index) => (
+    <div className="relative h-full flex flex-col items-center justify-center">
+      {boardData.map((row, index) => (
         <SingleConnectedRow key={index} rowState={row} rowIndex={index} />
       ))}
+      <ScoreBoardContainer />
     </div>
   );
 };
